@@ -1,5 +1,5 @@
 import bcryptjs from 'bcryptjs'
-import jwt from 'jsonwebtoken'
+import { createAccessToken } from '../libs/jwt.js';
 import { UserModel } from '../models/user.model.js';
 
 const register = async (req, res) =>{
@@ -20,10 +20,12 @@ const register = async (req, res) =>{
 
         const newUser = await UserModel.create({email, password:hashedPassword, username});
 
-        const token = jwt.sign({email: newUser.EMAIL}, process.env.JWT_SECRET_KEY, {expiresIn: "1h"})
-        return res.status(201).json({
-            ok: true,
-            msg: token
+        const token = await createAccessToken({email: newUser.EMAIL})
+        res.cookie('token', token);
+        res.status(201).json({
+            id: newUser.UID,
+            username: newUser.USERNAME,
+            email: newUser.EMAIL,
         })
 
     } catch(error){
@@ -36,9 +38,10 @@ const register = async (req, res) =>{
 }
 
 const login = async (req, res) =>{
-    try{
-        const {email, password} = req.body;
-        
+
+    const { email, password } = req.body;
+
+    try{ 
         if(!email || !password){
             return res.status(400).json({ok: false, msg: 'Missing required fields'})
         }
@@ -54,12 +57,13 @@ const login = async (req, res) =>{
             return res.status(401).json({ok: false, msg: 'Invalid credentials'});
         }
 
-        const token = jwt.sign({email: userExists.EMAIL}, process.env.JWT_SECRET_KEY, {expiresIn: "1h"})
-
-        return res.status(200).json({
-            ok: true,
-            msg: token
-        })
+        const token = await createAccessToken({email: userExists.EMAIL})
+        res.cookie('token', token);
+        res.status(200).json({
+            id: userExists.UID,
+            username: userExists.USERNAME,
+            email: userExists.EMAIL,
+        })                  
 
     } catch(error){
         console.log(error);
@@ -70,9 +74,19 @@ const login = async (req, res) =>{
     }
 }
 
+const logout = async (req, res) => {
+    res.cookie('token', "", { expires: new Date(0)});
+    return res.status(200).json({msg: 'logout successful'});
+};
+
 const profile = async (req, res) => {
+    console.log('Profile', req.user)
     try{
-        const user = await UserModel.findOneByEmail(req.email);
+        const user = await UserModel.findOneByEmail(req.user.email);
+        if(!user){
+            return res.status(400).json({ok: false, msg: 'User not found'});
+        }
+
         return res.json({ok: true, msg: user});
     } catch (error){
         console.log(error);
@@ -86,5 +100,6 @@ const profile = async (req, res) => {
 export const userController = {
     register,
     login,
+    logout,
     profile
 }

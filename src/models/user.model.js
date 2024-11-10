@@ -10,7 +10,6 @@ const create = async ({ email, password, username }) => {
     };
     const [result] = await pool.query(query.text, query.values);
     const [rows] = await pool.query('SELECT * FROM USERS WHERE uid = ?', [result.insertId]);
-    console.log(rows);
     return rows[0];
 };
 

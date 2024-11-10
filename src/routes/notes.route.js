@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { verifyToken } from '../middleware/jwt.middleware';
-import { notesController } from '../controller/notes.controller.js';
+import { verifyToken } from '../../middleware/jwt.middleware.js';
+import { notesController } from '../../controller/notes.controller.js';
 
 const router = Router();
 
