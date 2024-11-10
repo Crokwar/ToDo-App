@@ -1,19 +1,14 @@
 import jwt from 'jsonwebtoken';
 
 export const verifyToken = (req, res, next) => {
-
-    let token = req.headers.authorization;
-
+    let { token } = req.cookies;
     if(!token) {
         return res.status(401).json({error: 'Token not provided'});
     }
-
-    token = token.split(" ")[1];
-    console.log(token);
-
+    
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET_kEY);
-        req.email = decoded.email;
+        req.user = decoded;
         next();
     } catch (error) {
         console.log(error);
