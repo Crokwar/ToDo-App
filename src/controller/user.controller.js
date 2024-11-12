@@ -57,7 +57,7 @@ const login = async (req, res) =>{
             return res.status(401).json({ok: false, msg: 'Invalid credentials'});
         }
 
-        const token = await createAccessToken({email: userExists.EMAIL})
+        const token = await createAccessToken({id: userExists.UID, email: userExists.EMAIL})
         res.cookie('token', token);
         res.status(200).json({
             id: userExists.UID,
@@ -80,7 +80,6 @@ const logout = async (req, res) => {
 };
 
 const profile = async (req, res) => {
-    console.log('Profile', req.user)
     try{
         const user = await UserModel.findOneByEmail(req.user.email);
         if(!user){
