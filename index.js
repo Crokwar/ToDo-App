@@ -11,8 +11,8 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.use('/api/v1/users', userRouter);
-app.use('/api/v1', notesRouter);
+app.use('/api/users', userRouter);
+app.use('/api', notesRouter);
 
 const PORT = process.env.PORT || 3000;
 
