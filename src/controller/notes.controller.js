@@ -20,7 +20,7 @@ const createNote = async (req, res) => {
     
     try {
         const createdNote = await notesModel.create({title, description, user_id, tags, due_date, image_url});
-        return res.status(201).json({msg: createdNote})
+        return res.status(201).json({msg: 'Note created successfully'})
         
     } catch (error) {
         console.log(error);
@@ -32,7 +32,7 @@ const deleteNote = async (req, res) => {
     const { id } = req.params;
     try {
         const deletedNote = await notesModel.eliminate({id});
-        return res.status(410).json({msg: deletedNote})
+        return res.status(204).json({msg: 'Note deleted successfully'})
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: error });
